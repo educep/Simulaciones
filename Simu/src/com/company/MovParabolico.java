@@ -41,25 +41,27 @@ class MovParabolico {
         double [] pos = new double [2];
         pos[0] = this.velocidad * Math.cos(this.anguloEnRads) * tiempo; //posicion en x
         pos[1] = - this.g * tiempo * tiempo / 2 + (this.velocidad * Math.sin(this.anguloEnRads) *
-                tiempo) + this.alturainicial; //posicion en x
+                tiempo) + this.alturainicial; //posicion en y
         //DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
         //System.out.println("x = " + twoDecPlaces.format(pos[0]) + " y = " + twoDecPlaces.format(pos[1]));
         return pos;
     }
-    /*
-        private double VerticalPosition(double time, double velocidad) {
-            double y ;
-            y = (velocidad * time) - (this.g * time * time / 2);
-            //System.out.println("speed = " + y + " time = " + time);
-            return y;
-        }
-    */
+
+    private double [] Velocidad(double tiempo) {
+        double [] vel = new double [2];
+        vel[0] = this.velocidad * Math.cos(this.anguloEnRads); //velocidad en x
+        vel[1] = - this.g * tiempo + this.velocidad * Math.sin(this.anguloEnRads); //velocidad en y
+        //DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
+        //System.out.println("Vx = " + twoDecPlaces.format(vel[0]) + " Vy = " + twoDecPlaces.format(vel[1]));
+        return vel;
+    }
+
     public static void main(String[] arg) {
 
         //Parámetros de experimento
-        double Velocidad = 20; //en metros / segundo
-        double Angulo = 45; //en grados
-        double Altura = 10; //en metros
+        double Velocidad = 9; //en metros / segundo
+        double Angulo = 30.95; //en grados
+        double Altura = 30; //en metros
         int NroPasos = 100; //para los pasos del tiempo
 
         try {
@@ -84,22 +86,29 @@ class MovParabolico {
         double PasoTiempo = TiempoMax / NroPasos;
         System.out.println("Delta t = " + twoDecPlaces.format(PasoTiempo) + "s");
 
+        double [] Tiempos = new double[NroPasos + 1];
         double [] XPos = new double[NroPasos + 1];
         double [] YPos = new double[NroPasos + 1];
-        double [] Tiempos = new double[NroPasos + 1];
+        double [] XVel = new double[NroPasos + 1];
+        double [] YVel = new double[NroPasos + 1];
 
         double [] tPos = new double[2];
-        //Inicialización:
-        XPos[0] = 0;
-        YPos[0] = Altura;
-        Tiempos[0] = 0;
-        for(int i = 1; i <= NroPasos ; i++ ){
+        double [] tVel = new double[2];
+
+        for(int i = 0; i <= NroPasos ; i++ ){
             Tiempos[i] = PasoTiempo * i;
             tPos = TiroParabolico.Posicion(Tiempos[i]);
             XPos[i] = tPos[0];
             YPos[i] = tPos[1];
-            System.out.println("t = "+ twoDecPlaces.format(Tiempos[i]) +
+            System.out.println("Pos: t = "+ twoDecPlaces.format(Tiempos[i]) +
                     "s: ("+ twoDecPlaces.format(XPos[i]) + " ; " + twoDecPlaces.format(YPos[i])+')'  );
+            tVel = TiroParabolico.Velocidad(Tiempos[i]);
+            XVel[i] = tVel[0];
+            YVel[i] = tVel[1];
+            System.out.println("Vel: t = "+ twoDecPlaces.format(Tiempos[i]) +
+                    "s: ("+ twoDecPlaces.format(XVel[i]) + " ; " + twoDecPlaces.format(YVel[i])+')'  );
+
+
         }
     }
 }
