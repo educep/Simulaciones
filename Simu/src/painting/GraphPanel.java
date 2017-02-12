@@ -12,7 +12,7 @@ import java.util.List;
  */
 /**
  *
- * @author Rodrigo
+ * @author Rodrigo (obtained from slack)
  * ou can define something like
  * int graphWidth = getWidth() - 2 * padding - labelPadding; int graphHeight = getHeight() - 2 * padding - labelPadding;
  * to avoid calculating position every time.
@@ -53,7 +53,7 @@ public class GraphPanel extends JPanel {
         for (int i = 0; i < scoresY.size(); i++) {
             int x1 = (int) (i * xScale + padding + labelPadding);
             int y1 = (int) ((getMaxScore() - scoresY.get(i)) * yScale + padding);
-            System.out.println("x = " + scoresX.get(i) + ";" + "y = " + scoresY.get(i));
+            //System.out.println("x = " + scoresX.get(i) + ";" + "y = " + scoresY.get(i));
             graphPoints.add(new Point(x1, y1));
         }
 
@@ -107,31 +107,6 @@ public class GraphPanel extends JPanel {
                 g2.drawLine(x0, y0, x1, y1);
             }
         }
-
-        /*
-        // and for x axis
-        for (int i = 0; i < scoresY.size(); i++) {
-            if (scoresY.size() > 1) {
-                int x0 = i * (getWidth() - padding * 2 - labelPadding)
-                        / (scoresY.size() - 1) + padding + labelPadding;
-                int x1 = x0;
-                int y0 = getHeight() - padding - labelPadding;
-                int y1 = y0 - pointWidth;
-                if ((i % ((int) ((scoresY.size() / 20.0)) + 1)) == 0) {
-                    g2.setColor(gridColor);
-                    g2.drawLine(x0, getHeight() - padding - labelPadding -
-                            1 - pointWidth, x1, padding);
-                    g2.setColor(Color.BLACK);
-                    String xLabel = i + "";
-                    FontMetrics metrics = g2.getFontMetrics();
-                    int labelWidth = metrics.stringWidth(xLabel);
-                    g2.drawString(xLabel, x0 - labelWidth / 2, y0 +
-                            metrics.getHeight() + 3);
-                }
-                g2.drawLine(x0, y0, x1, y1);
-            }
-        }
-    */
 
         // create x and y axes
         g2.drawLine(padding + labelPadding, getHeight() - padding - labelPadding,
@@ -189,6 +164,8 @@ public class GraphPanel extends JPanel {
         for (Double score : scoresY) {
             maxScore = Math.max(maxScore, score);
         }
+        //maxScore = maxScore % 10 - 10; //take into account the padding ()
+        //System.out.println("getMinScore = " + maxScore);
         return maxScore;
     }
 
@@ -219,7 +196,7 @@ public class GraphPanel extends JPanel {
 
         GraphPanel mainPanel = new GraphPanel(TiroParabolico.XPos,TiroParabolico.YPos);
         mainPanel.setPreferredSize(new Dimension(800, 600));
-        JFrame frame = new JFrame("Tiro Parabólico - CepedaHnos");
+        JFrame frame = new JFrame("Parabolic Motion");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(mainPanel);
         frame.pack();
