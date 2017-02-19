@@ -30,12 +30,23 @@ public class GraphPanel extends JPanel {
     private int pointWidth = 4;
     private int numberYDivisions = 10;
     private int numberXDivisions = 10;
-    private List<Double> scoresY;
-    private List<Double> scoresX;
+    private List<Double> TrajectoryTime; //gives time of trajectory over which are computed:
+    private List<Double> scoresY; //gives position in Y
+    private List<Double> scoresX; //gives position in X
+    private List<Double> VelX; //gives velocity in X
+    private List<Double> VelY; //gives velocity in Y
+    private List<Double> Velocity; //gives velocity intensity
+    private List<Double> Angle; //gives velocity direction
 
-    public GraphPanel(List<Double> scoresX ,List<Double> scoresY) {
-       this.scoresY = scoresY;
-        this.scoresX = scoresX;
+    public GraphPanel(MovParabolico ParabolicMotion) {
+        //Here we retrieve all the components that are going to be shown on the graphic
+        this.TrajectoryTime = ParabolicMotion.TrajectoryTime;
+        this.scoresX = ParabolicMotion.XPos;
+        this.scoresY = ParabolicMotion.YPos;
+        this.VelX = ParabolicMotion.XVel;
+        this.VelY = ParabolicMotion.YVel;
+        this.Velocity = ParabolicMotion.ModVel;
+        this.Angle = ParabolicMotion.AngleInGrads;
     }
 
     @Override
@@ -190,11 +201,10 @@ public class GraphPanel extends JPanel {
     private static void createAndShowGui() {
         List<Double> scores = new ArrayList<>();
         //Random random = new Random();
-        MovParabolico TiroParabolico;
-        TiroParabolico = new MovParabolico(25, 45, 10);
+        MovParabolico ParabolicMotion = new MovParabolico(25, 45, 10);
 
 
-        GraphPanel mainPanel = new GraphPanel(TiroParabolico.XPos,TiroParabolico.YPos);
+        GraphPanel mainPanel = new GraphPanel(ParabolicMotion);
         mainPanel.setPreferredSize(new Dimension(800, 600));
         JFrame frame = new JFrame("Parabolic Motion");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

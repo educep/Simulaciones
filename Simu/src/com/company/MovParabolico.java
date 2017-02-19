@@ -16,12 +16,14 @@ public class MovParabolico {
     double g = 9.8;// SI units
     public double velocity, initialhigh, RadsAngle;
     public double maxhigh, maxdistance, flyTime;
-    int NroPasos = 100; //para los pasos del time_
+    int NroPasos = 100; //number of time steps
     public List<Double> TrajectoryTime;
     public List<Double> XPos;
     public List<Double> YPos;
     public List<Double> XVel;
     public List<Double> YVel;
+    public List<Double> ModVel; //velocity's intensity on t
+    public List<Double> AngleInGrads; //velocity direction on t
 
     public MovParabolico(double velocity, double AngleInGrads, double initialhigh) {
         this.RadsAngle = AngleInGrads * Math.PI / 180;
@@ -40,10 +42,10 @@ public class MovParabolico {
         this.maxdistance = Pos2[0];
         this.Simulate();
         //System.out.println("maxima distancia = " + twoDecPlaces.format(maxdistance)  + "m");
-        DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
-        System.out.println("Fly time = " + twoDecPlaces.format(flyTime) + "s");
-        System.out.println("Max Distance = " + twoDecPlaces.format(maxdistance) + "m");
-        System.out.println("Max High = " + twoDecPlaces.format(maxhigh) + "m");
+        //DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
+        //System.out.println("Fly time = " + twoDecPlaces.format(flyTime) + "s");
+        //System.out.println("Max Distance = " + twoDecPlaces.format(maxdistance) + "m");
+        //System.out.println("Max High = " + twoDecPlaces.format(maxhigh) + "m");
     }
 
     private double [] PositionXY(double time_) {
@@ -58,11 +60,15 @@ public class MovParabolico {
 
     private double [] Velocity(double time_) {
         double [] vel = new double [2];
-        vel[0] = this.velocity * Math.cos(this.RadsAngle); //velocity en x
-        vel[1] = - this.g * time_ + this.velocity * Math.sin(this.RadsAngle); //velocity en y
+        vel[0] = this.velocity * Math.cos(this.RadsAngle); //velocity on x
+        vel[1] = - this.g * time_ + this.velocity * Math.sin(this.RadsAngle); //velocity on y
         //DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
         //System.out.println("Vx = " + twoDecPlaces.format(vel[0]) + " Vy = " + twoDecPlaces.format(vel[1]));
         return vel;
+    }
+
+    private double AngleInGrads(double Vx, double Vy) {
+        return Math.atan(Vy / Vx)  / Math.PI * 180;
     }
 
     public void Simulate() {
@@ -71,6 +77,8 @@ public class MovParabolico {
         List<Double> YPos = new ArrayList<>();
         List<Double> XVel = new ArrayList<>();
         List<Double> YVel = new ArrayList<>();
+        List<Double> ModVel = new ArrayList<>();
+        List<Double> AngInGrads = new ArrayList<>();
 
         DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
         double PasoTiempo = this.flyTime / this.NroPasos;
@@ -84,45 +92,38 @@ public class MovParabolico {
             tPos = PositionXY(TrajectoryTime.get(i));
             XPos.add(tPos[0]);
             YPos.add(tPos[1]);
-            //System.out.println("Pos: t = " + twoDecPlaces.format(TrajectoryTime.get(i)) +
-            //        "s: (" + twoDecPlaces.format(XPos.get(i)) + " ; " +
-            //        twoDecPlaces.format(YPos.get(i)) + ')');
+            System.out.println("Pos: t = " + twoDecPlaces.format(TrajectoryTime.get(i)) +
+                    "s: (" + twoDecPlaces.format(XPos.get(i)) + " ; " +
+                    twoDecPlaces.format(YPos.get(i)) + ')');
+
             tVel = Velocity(TrajectoryTime.get(i));
             XVel.add(tVel[0]);
             YVel.add(tVel[1]);
-            //System.out.println("Vel: t = " + twoDecPlaces.format(TrajectoryTime.get(i)) +
-            //       "s: (" + twoDecPlaces.format(XVel.get(i)) + " ; " +
-            //        twoDecPlaces.format(YVel.get(i)) + ')');
+            System.out.println("Vel: t = " + twoDecPlaces.format(TrajectoryTime.get(i)) +
+                   "s: (" + twoDecPlaces.format(XVel.get(i)) + " ; " +
+                    twoDecPlaces.format(YVel.get(i)) + ')');
+
+            ModVel.add(Math.sqrt(tVel[0]*tVel[0] + tVel[1]*tVel[1]));
+            AngInGrads.add(AngleInGrads(tVel[0],tVel[1]));
+            System.out.println("(Vel,Direction): t = " + twoDecPlaces.format(TrajectoryTime.get(i)) +
+                    "s: (" + twoDecPlaces.format(ModVel.get(i)) + " ; " +
+                    twoDecPlaces.format(AngInGrads.get(i)) + ')');
         }
         this.TrajectoryTime = TrajectoryTime;
         this.XPos = XPos;
         this.YPos = YPos;
         this.XVel = XVel;
         this.YVel = YVel;
+        this.ModVel = ModVel;
+        this.AngleInGrads = AngInGrads;
         System.out.println("Simulation finished, values computed");
-
-        /*
-        for (int i = 0; i <= NroPasos; i++) {
-            TrajectoryTime[i] = (double) i * PasoTiempo;
-            tPos = PositionXY(TrajectoryTime[i]);
-            XPos[i] = tPos[0];
-            YPos[i] = tPos[1];
-            System.out.println("Pos: t = " + twoDecPlaces.format(TrajectoryTime[i]) +
-                    "s: (" + twoDecPlaces.format(XPos[i]) + " ; " + twoDecPlaces.format(YPos[i]) + ')');
-            tVel = Velocity(TrajectoryTime[i]);
-            XVel[i] = tVel[0];
-            YVel[i] = tVel[1];
-            System.out.println("Vel: t = " + twoDecPlaces.format(TrajectoryTime[i]) +
-                    "s: (" + twoDecPlaces.format(XVel[i]) + " ; " + twoDecPlaces.format(YVel[i]) + ')');
-        }
-        */
     }
 
     public static void main(String[] arg) {
 
         //Experiment Parameters
-        double Velocity = 9; // m / s
-        double Angle = 30.95; // grades
+        double Velocity = 9; // vector velocity intensity = sqrt(Vx^2 + Vy^2) m / s
+        double Angle = 30; // grades
         double HighY0 = 30; // m
 
         try {
@@ -130,8 +131,8 @@ public class MovParabolico {
             Angle = Double.parseDouble(arg[1]);
             HighY0 = Double.parseDouble(arg[2]);
         }
-        catch (ArrayIndexOutOfBoundsException e) { System.out.println("*1*");} // ...no arg
-        catch (NumberFormatException e) {System.out.println("*2*");} // ...or invalid arg
+        catch (ArrayIndexOutOfBoundsException e) { System.out.println("*no args*");} // ...no arg
+        catch (NumberFormatException e) {System.out.println("*invalid args*");} // ...or invalid arg
 
         MovParabolico TiroParabolico = new MovParabolico(Velocity, Angle, HighY0);
         double TiempoMax = TiroParabolico.flyTime;
