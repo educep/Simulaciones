@@ -12,7 +12,7 @@ import java.util.List;
  */
 /**
  *
- * @author Rodrigo (obtained from slack)
+ * @author Rodrigo (obtained from stackoverflow)
  * ou can define something like
  * int graphWidth = getWidth() - 2 * padding - labelPadding; int graphHeight = getHeight() - 2 * padding - labelPadding;
  * to avoid calculating position every time.
@@ -40,6 +40,11 @@ public class GraphPanel extends JPanel {
 
     public GraphPanel(MovParabolico ParabolicMotion) {
         //Here we retrieve all the components that are going to be shown on the graphic
+        //Computing trajectory
+        ParabolicMotion.Simulate();
+        //Setting new time step
+        ParabolicMotion.DeltaTime = 0.1;
+        ParabolicMotion.Simulate();
         this.TrajectoryTime = ParabolicMotion.TrajectoryTime;
         this.scoresX = ParabolicMotion.XPos;
         this.scoresY = ParabolicMotion.YPos;
@@ -200,8 +205,8 @@ public class GraphPanel extends JPanel {
 
     private static void createAndShowGui() {
         List<Double> scores = new ArrayList<>();
-        //Random random = new Random();
-        MovParabolico ParabolicMotion = new MovParabolico(25, 45, 10);
+        //Parabolic Motion drawn by default:
+        MovParabolico ParabolicMotion = new MovParabolico(25, 45, 10, 0.025);
 
 
         GraphPanel mainPanel = new GraphPanel(ParabolicMotion);

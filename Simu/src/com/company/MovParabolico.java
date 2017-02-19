@@ -16,7 +16,7 @@ public class MovParabolico {
     double g = 9.8;// SI units
     public double velocity, initialhigh, RadsAngle;
     public double maxhigh, maxdistance, flyTime;
-    int NroPasos = 100; //number of time steps
+    public double DeltaTime; //default time step, it will set the number of time steps
     public List<Double> TrajectoryTime;
     public List<Double> XPos;
     public List<Double> YPos;
@@ -25,13 +25,14 @@ public class MovParabolico {
     public List<Double> ModVel; //velocity's intensity on t
     public List<Double> AngleInGrads; //velocity direction on t
 
-    public MovParabolico(double velocity, double AngleInGrads, double initialhigh) {
+    public MovParabolico(double velocity, double AngleInGrads, double initialhigh, double deltatime) {
         this.RadsAngle = AngleInGrads * Math.PI / 180;
         this.velocity = velocity;
         this.initialhigh = initialhigh;
         double aux = velocity * Math.sin(RadsAngle);
         this.flyTime = (aux + Math.sqrt( aux * aux +
                 (2 * this.g * initialhigh))) / this.g ;
+        this.DeltaTime = deltatime;
         //maximal high, time given t = Vo * sin(theta) / g
         double[] Pos1 = PositionXY(velocity * Math.sin(RadsAngle) / this.g);
         this.maxhigh = Pos1[1];
@@ -40,7 +41,7 @@ public class MovParabolico {
         //Maximal distance, time is given by fly time
         double[] Pos2 = PositionXY(flyTime);
         this.maxdistance = Pos2[0];
-        this.Simulate();
+        //this.Simulate();
         //System.out.println("maxima distancia = " + twoDecPlaces.format(maxdistance)  + "m");
         //DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
         //System.out.println("Fly time = " + twoDecPlaces.format(flyTime) + "s");
@@ -81,14 +82,15 @@ public class MovParabolico {
         List<Double> AngInGrads = new ArrayList<>();
 
         DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
-        double PasoTiempo = this.flyTime / this.NroPasos;
-        System.out.println("Delta t = " + twoDecPlaces.format(PasoTiempo) + "s");
+        int TimeSteps = (int) (this.flyTime / this.DeltaTime);
+        //double DeltaTime = this.flyTime / this.NroPasos;
+        System.out.println("Delta t = " + twoDecPlaces.format(DeltaTime) + "s");
 
         double[] tPos = new double[2];
         double[] tVel = new double[2];
 
-        for (int i = 0; i <= NroPasos; i++) {
-            TrajectoryTime.add((double) i * PasoTiempo);
+        for (int i = 0; i <= TimeSteps; i++) {
+            TrajectoryTime.add((double) i * DeltaTime);
             tPos = PositionXY(TrajectoryTime.get(i));
             XPos.add(tPos[0]);
             YPos.add(tPos[1]);
@@ -116,6 +118,7 @@ public class MovParabolico {
         this.YVel = YVel;
         this.ModVel = ModVel;
         this.AngleInGrads = AngInGrads;
+        System.out.println("Number of time steps  " + twoDecPlaces.format(TimeSteps));
         System.out.println("Simulation finished, values computed");
     }
 
@@ -125,6 +128,7 @@ public class MovParabolico {
         double Velocity = 9; // vector velocity intensity = sqrt(Vx^2 + Vy^2) m / s
         double Angle = 30; // grades
         double HighY0 = 30; // m
+        double DeltaTime = 0.025; // s
 
         try {
             Velocity = Double.parseDouble(arg[0]);
@@ -134,16 +138,18 @@ public class MovParabolico {
         catch (ArrayIndexOutOfBoundsException e) { System.out.println("*no args*");} // ...no arg
         catch (NumberFormatException e) {System.out.println("*invalid args*");} // ...or invalid arg
 
-        MovParabolico TiroParabolico = new MovParabolico(Velocity, Angle, HighY0);
-        double TiempoMax = TiroParabolico.flyTime;
-        double xMax = TiroParabolico.maxdistance;
-        double yMax = TiroParabolico.maxhigh;
-        int NroPasos = TiroParabolico.NroPasos;
+        MovParabolico ParabolicM = new MovParabolico(Velocity, Angle, HighY0,DeltaTime);
+        ParabolicM.Simulate();
+        double TiempoMax = ParabolicM.flyTime;
+        double xMax = ParabolicM.maxdistance;
+        double yMax = ParabolicM.maxhigh;
+        int NbTimeSteps = (int) (ParabolicM.flyTime / ParabolicM.DeltaTime);
 
         DecimalFormat twoDecPlaces = new DecimalFormat("0.00");
         System.out.println("Fly Time = " + twoDecPlaces.format(TiempoMax) + "s");
         System.out.println("Max Distance = " + twoDecPlaces.format(xMax) + "m");
         System.out.println("Max High = " + twoDecPlaces.format(yMax) + "m");
+        System.out.println("Nb Time Steps = " + twoDecPlaces.format(NbTimeSteps) + "m");
 
 
 
